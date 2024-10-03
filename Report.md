@@ -8,9 +8,38 @@
 | Романовцев Дмитрий    | М8О-410Б-21 | RNN, Двунаправленная LSTM                  |              |
 | Малышев Назим | М8О-410Б-21 | LSTM, отчёт                 |              |
 
-> *Комментарии проверяющего*
 
 ## RNN
+
+Для тренировки использовалась повесть «Пикник на обочине». 
+
+### Побуквенная токенизация:
+Конфигурация слоев:
+```python
+model = keras.Sequential([
+    l.Embedding(len(alphabet), BATCH_SIZE, batch_input_shape=[BATCH_SIZE, None]),
+    l.SimpleRNN(512, return_sequences=True, stateful=True),
+    l.SimpleRNN(512, return_sequences=True, stateful=True),
+    l.Dense(len(alphabet))
+])
+```
+Обучение: 20 эпох, оптимизация - Adam.
+
+**Результаты:** Нейросеть генерирует новые слова, иногда образуя существительные, но нуждается в большем количестве эпох и более сложной архитектуре. Размер датасета можно увеличить.
+
+### Пословная токенизация:
+Конфигурация слоев:
+```python
+model = keras.Sequential([
+    l.Embedding(len(alphabet), BATCH_SIZE, batch_input_shape=[BATCH_SIZE, None]),
+    l.SimpleRNN(128, return_sequences=True, stateful=True),
+    l.Dense(len(alphabet) / 2, activation='relu'),
+    l.Dense(len(alphabet))
+])
+```
+Обучение: 50 эпох, оптимизация - Adam.
+
+**Результаты:** Нейросеть лучше составляет предложения, ставит запятые, но смысл остаётся неясным.
 
 ## LSTM
 
@@ -22,18 +51,16 @@
 
 Текст практически не имеет смысла, возможно, это связано с недостаточным объемом обучающего материала. Однако, из-за ограничений вычислительных ресурсов, обучение модели на больших текстовых массивах становится непрактичным. Например, обучение на одном романе на протяжении 100 эпох заняло - 2 часа.
 
-![image](.img/img01.jpg)
-
 ## Двунаправленная LSTM
 
-Для тренировки двунаправленной LSTM был выбран Гарри Поттер. Было решено применить 
+Для тренировки двунаправленной LSTM был выбран american psycho. Было решено применить 
 токенизацию по словам, чтобы улучшить качество генерируемого текста. Модель 
 обучалась 20 эпох, каждое следующее слово выбирается случайно из 5 наиболее 
 вероятных слов, которые могут идти после уже существующего текста. Пример 
-сгенерированного текста из 50 слов на основе фразы `My name is Harry Potter`:
+сгенерированного текста из 50 слов на основе фразы `My name is Patrick Vateman`:
 
 ```
-My name is Harry Potter is the right commercial Evelyn has to talk Evelyn 
+My name is Patrick Vateman is the right commercial Evelyn has to talk Evelyn 
 screams up Evelyn says Shes not paying some eerie muscles dont go back or the 
 waiter begins Uh yeah Bateman Helga asks her confused cuts me to inspect a 
 straight at a passing book But my god Evelyn says No Im
@@ -45,6 +72,5 @@ straight at a passing book But my god Evelyn says No Im
 вычислительных мощностях не представляется возможным натренировать модель на 
 больших объёмах текстах, даже на одном романе обучение 20 эпох заняло 3 часа.
 
-![image](.img/img02.jpg)
 
 ## Вывод
